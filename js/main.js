@@ -71,32 +71,7 @@
     });
   });
 
-  /* ---- PROJECT CARDS: per-letter scroll-scrubbed entry (6 variants) ---- */
-  var projVariants = [
-    function (L, st) {                                     // 0 — drop from above
-      gsap.from(L, { yPercent: -200, opacity: 0, stagger: { each: 0.045, from: "start" }, ease: "power3.out", scrollTrigger: st });
-    },
-    function (L, st) {                                     // 1 — sweep from right
-      gsap.from(L, { xPercent: 240, opacity: 0, stagger: { each: 0.03, from: "end" }, ease: "power2.out", scrollTrigger: st });
-    },
-    function (L, st) {                                     // 2 — rise from below
-      gsap.from(L, { yPercent: 200, opacity: 0, stagger: { each: 0.045, from: "start" }, ease: "power3.out", scrollTrigger: st });
-    },
-    function (L, st) {                                     // 3 — chaotic glitch settle
-      gsap.from(L, {
-        x: function () { return (Math.random() - 0.5) * 140; },
-        y: function () { return (Math.random() - 0.5) * 70; },
-        opacity: 0, stagger: { each: 0.025, from: "random" }, ease: "power2.out", scrollTrigger: st
-      });
-    },
-    function (L, st) {                                     // 4 — sweep from left
-      gsap.from(L, { xPercent: -240, opacity: 0, stagger: { each: 0.03, from: "start" }, ease: "power2.out", scrollTrigger: st });
-    },
-    function (L, st) {                                     // 5 — zoom out from centre
-      gsap.from(L, { scale: 0, opacity: 0, transformOrigin: "50% 50%", stagger: { each: 0.045, from: "center" }, ease: "back.out(1.6)", scrollTrigger: st });
-    }
-  ];
-
+  /* ---- PROJECT CARDS: per-letter scroll-scrubbed entry (single unified animation) ---- */
   gsap.utils.toArray(".proj").forEach(function (card, i) {
     var title = card.querySelector("h3");
     if (title) {
@@ -111,7 +86,14 @@
       }
       var letters = title.querySelectorAll(".tl");
       var st = { trigger: card, start: "top 92%", end: "top 45%", scrub: 0.6, invalidateOnRefresh: true };
-      projVariants[i % projVariants.length](letters, st);
+      // unified animation across all cards: letters drop in from above like dots, staggered
+      gsap.from(letters, {
+        yPercent: -180,
+        opacity: 0,
+        stagger: { each: 0.04, from: "start" },
+        ease: "power3.out",
+        scrollTrigger: st
+      });
     }
     var desc = card.querySelector("p");
     if (desc) gsap.from(desc, { opacity: 0, y: 24, ease: "power1.out",

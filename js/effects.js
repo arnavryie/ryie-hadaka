@@ -363,6 +363,120 @@
       }
     },
 
+    /* particles_implode — reverse of burst: dots fly INWARD from outside the canvas to targets */
+    particles_implode: {
+      idle: true,
+      setup: function (S) {
+        var W = S.w, H = S.h;
+        var step = Math.max(4, Math.ceil(Math.sqrt((W * H) / 8000)));
+        var cols = Math.max(1, Math.floor(W / step));
+        var rows = Math.max(1, Math.floor(H / step));
+        var t = tmpCanvas(cols, rows);
+        var tc = t.getContext("2d");
+        var b = coverBox(S.img.naturalWidth, S.img.naturalHeight, cols, rows);
+        tc.drawImage(S.img, b.dx, b.dy, b.dw, b.dh);
+        var data; try { data = tc.getImageData(0, 0, cols, rows).data; } catch (e) { data = null; }
+        var cx = W / 2, cy = H / 2;
+        var R = Math.hypot(W, H) * 0.7;
+        var P = [];
+        for (var y = 0; y < rows; y++) {
+          for (var x = 0; x < cols; x++) {
+            var i = (y * cols + x) * 4;
+            var a = data ? data[i + 3] : 255;
+            if (a < 24) continue;
+            var r = data ? data[i] : 200, g = data ? data[i + 1] : 200, bl = data ? data[i + 2] : 200;
+            var tx = x * step + step / 2, ty = y * step + step / 2;
+            var dx = tx - cx, dy = ty - cy;
+            var d2 = Math.hypot(dx, dy) || 1;
+            P.push({
+              tx: tx, ty: ty,
+              sx: cx + (dx / d2) * R + (Math.random() - 0.5) * 40,
+              sy: cy + (dy / d2) * R + (Math.random() - 0.5) * 40,
+              d: Math.random() * 0.4,
+              col: "rgb(" + r + "," + g + "," + bl + ")",
+              ph: Math.random() * 6.28
+            });
+          }
+        }
+        S.store.P = P; S.store.ps = Math.max(1.4, step * 0.85);
+      },
+      frame: function (ctx, p, t, S) {
+        var P = S.store.P, ps = S.store.ps, n = P.length, halfPS = ps / 2;
+        for (var k = 0; k < n; k++) {
+          var pt = P[k];
+          var local = clamp((p - pt.d) / (1 - pt.d), 0, 1);
+          var e = ease(local), x, y, al;
+          if (p >= 0.999) {
+            x = pt.tx + Math.sin(t * 1.5 + pt.ph) * 0.7;
+            y = pt.ty + Math.cos(t * 1.5 + pt.ph) * 0.7; al = 1;
+          } else {
+            x = lerp(pt.sx, pt.tx, e); y = lerp(pt.sy, pt.ty, e);
+            al = clamp(0.2 + local * 1.1, 0, 1);
+          }
+          ctx.globalAlpha = al; ctx.fillStyle = pt.col;
+          ctx.fillRect(x - halfPS, y - halfPS, ps, ps);
+        }
+        ctx.globalAlpha = 1;
+      }
+    },
+
+    /* particles_tilt_left — mirror of particles_tilt: diagonal from TOP-LEFT, -30° rotation */
+    particles_tilt_left: {
+      idle: true,
+      setup: function (S) {
+        var W = S.w, H = S.h;
+        var step = Math.max(4, Math.ceil(Math.sqrt((W * H) / 8000)));
+        var cols = Math.max(1, Math.floor(W / step));
+        var rows = Math.max(1, Math.floor(H / step));
+        var t = tmpCanvas(cols, rows);
+        var tc = t.getContext("2d");
+        var b = coverBox(S.img.naturalWidth, S.img.naturalHeight, cols, rows);
+        tc.drawImage(S.img, b.dx, b.dy, b.dw, b.dh);
+        var data; try { data = tc.getImageData(0, 0, cols, rows).data; } catch (e) { data = null; }
+        var P = [];
+        for (var y = 0; y < rows; y++) {
+          for (var x = 0; x < cols; x++) {
+            var i = (y * cols + x) * 4;
+            var a = data ? data[i + 3] : 255;
+            if (a < 24) continue;
+            var r = data ? data[i] : 200, g = data ? data[i + 1] : 200, bl = data ? data[i + 2] : 200;
+            var off = Math.random();
+            P.push({
+              tx: x * step + step / 2, ty: y * step + step / 2,
+              sx: -off * W * 0.5 - 6,
+              sy: -off * H * 0.5 - 6,
+              d: Math.random() * 0.45,
+              col: "rgb(" + r + "," + g + "," + bl + ")",
+              ph: Math.random() * 6.28
+            });
+          }
+        }
+        S.store.P = P; S.store.ps = Math.max(1.4, step * 0.88);
+        S.store.ca = Math.cos(-Math.PI / 6); S.store.sa = Math.sin(-Math.PI / 6);
+      },
+      frame: function (ctx, p, t, S) {
+        var P = S.store.P, ps = S.store.ps, n = P.length, halfPS = ps / 2;
+        var dpr = S.dpr, ca = S.store.ca, sa = S.store.sa;
+        for (var k = 0; k < n; k++) {
+          var pt = P[k];
+          var local = clamp((p - pt.d) / (1 - pt.d), 0, 1);
+          var e = ease(local), x, y, al;
+          if (p >= 0.999) {
+            x = pt.tx + Math.sin(t * 1.6 + pt.ph) * 0.6;
+            y = pt.ty + Math.cos(t * 1.6 + pt.ph) * 0.6; al = 1;
+          } else {
+            x = lerp(pt.sx, pt.tx, e); y = lerp(pt.sy, pt.ty, e);
+            al = clamp(0.2 + local * 1.1, 0, 1);
+          }
+          ctx.globalAlpha = al; ctx.fillStyle = pt.col;
+          ctx.setTransform(dpr * ca, dpr * sa, -dpr * sa, dpr * ca, dpr * x, dpr * y);
+          ctx.fillRect(-halfPS, -halfPS, ps, ps);
+        }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.globalAlpha = 1;
+      }
+    },
+
     /* chunky pixels resolve into the sharp image */
     mosaic: {
       idle: false,
