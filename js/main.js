@@ -63,6 +63,29 @@
     onEnter: function (b) { gsap.from(b, { y: 50, opacity: 0, duration: 0.9, stagger: 0.08, ease: "power3.out", overwrite: true }); }
   });
 
+  /* ---- BG SECTION FADES: each canvas only visible when its section is centered, dark between ---- */
+  gsap.utils.toArray(".art.bg").forEach(function (bg) {
+    var section = bg.closest(".world");
+    if (!section) return;
+    bg.style.willChange = "opacity";
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top bottom",
+      end: "bottom top",
+      onUpdate: function (self) {
+        var p = self.progress;
+        var op;
+        // bell curve: dark → fade in → hold → fade out → dark
+        if (p < 0.25) op = 0;
+        else if (p < 0.40) op = (p - 0.25) / 0.15;
+        else if (p < 0.60) op = 1;
+        else if (p < 0.75) op = (0.75 - p) / 0.15;
+        else op = 0;
+        bg.style.opacity = op;
+      }
+    });
+  });
+
   /* ---- scale-in for the image frames as they arrive ---- */
   gsap.utils.toArray(".art:not(.bg)").forEach(function (el) {
     gsap.from(el, {
