@@ -1,49 +1,22 @@
-# RYIE — patch: paired animations + unified project text
+# RYIE — consolidated patch (4 changes)
 
-**Three changes across 3 files. Give to Antigravity.**
-
----
-
-## What's happening
-
-- W2 (acidneon) gets a new effect `particles_implode` — the **reverse of W3 burst**.
-  Dots fly INWARD from outside the canvas and converge into the image.
-- W4 (italy) gets a new effect `particles_tilt_left` — the **mirror of W5 tilt**.
-  Dots come diagonally from the top-LEFT with -30° rotation, matching W5's right-side motion.
-- Result: W2-W3 are now a mirrored pair (implode/burst), W4-W5 are a mirrored pair (left-tilt/right-tilt).
-  Less random feeling, more intentional.
-- Projects section: all 6 cards now share ONE animation — letters drop in from above
-  like dots, staggered. No more 6 different variants.
+Give all of these to Antigravity in one shot.
 
 ---
 
-## Change 1 — `js/effects.js`
+## 1 · `js/effects.js` — add 2 new canvas effects
 
-**Find** the closing of `particles_chunky` followed by `mosaic` (around line 364):
+Find this comment (unique anchor, should be near line 480):
 
 ```javascript
-          ctx.globalAlpha = al; ctx.fillStyle = pt.col;
-          ctx.fillRect(x - halfPS, y - halfPS, ps, ps);
-        }
-        ctx.globalAlpha = 1;
-      }
-    },
-
     /* chunky pixels resolve into the sharp image */
     mosaic: {
 ```
 
-**Replace with** (inserts two new effects between particles_chunky and mosaic):
+Insert the following block **immediately before** that comment:
 
 ```javascript
-          ctx.globalAlpha = al; ctx.fillStyle = pt.col;
-          ctx.fillRect(x - halfPS, y - halfPS, ps, ps);
-        }
-        ctx.globalAlpha = 1;
-      }
-    },
-
-    /* particles_implode — reverse of burst: dots fly INWARD from outside the canvas to targets */
+    /* particles_implode — reverse of burst: dots fly INWARD from an off-screen ring to their targets */
     particles_implode: {
       idle: true,
       setup: function (S) {
@@ -157,96 +130,43 @@
       }
     },
 
-    /* chunky pixels resolve into the sharp image */
-    mosaic: {
 ```
 
 ---
 
-## Change 2 — `index.html`
-
-**Two single-line swaps.**
+## 2 · `index.html` — swap 2 data-effect values
 
 **Find:**
 ```html
-      <div class="art bg" data-effect="particles_swipe" data-src="assets/img/acidneon.jpg"><canvas></canvas></div>
+<div class="art bg" data-effect="particles_swipe" data-src="assets/img/acidneon.jpg">
 ```
 **Replace with:**
 ```html
-      <div class="art bg" data-effect="particles_implode" data-src="assets/img/acidneon.jpg"><canvas></canvas></div>
-```
-
-**Find:**
-```html
-      <div class="art bg" data-effect="particles_rise" data-src="assets/img/italy.jpg"><canvas></canvas></div>
-```
-**Replace with:**
-```html
-      <div class="art bg" data-effect="particles_tilt_left" data-src="assets/img/italy.jpg"><canvas></canvas></div>
+<div class="art bg" data-effect="particles_implode" data-src="assets/img/acidneon.jpg">
 ```
 
 ---
 
-## Change 3 — `js/main.js`
+**Find:**
+```html
+<div class="art bg" data-effect="particles_rise" data-src="assets/img/italy.jpg">
+```
+**Replace with:**
+```html
+<div class="art bg" data-effect="particles_tilt_left" data-src="assets/img/italy.jpg">
+```
 
-**Find** the entire 6-variant project block (starts at the `/* ---- PROJECT CARDS` comment, ends at the closing `});` of the `.proj` forEach):
+---
+
+## 3 · `js/main.js` — unified project title animation
+
+Find the entire project cards block (starts with this comment):
 
 ```javascript
-  /* ---- PROJECT CARDS: per-letter scroll-scrubbed entry (6 variants) ---- */
-  var projVariants = [
-    function (L, st) {                                     // 0 — drop from above
-      gsap.from(L, { yPercent: -200, opacity: 0, stagger: { each: 0.045, from: "start" }, ease: "power3.out", scrollTrigger: st });
-    },
-    function (L, st) {                                     // 1 — sweep from right
-      gsap.from(L, { xPercent: 240, opacity: 0, stagger: { each: 0.03, from: "end" }, ease: "power2.out", scrollTrigger: st });
-    },
-    function (L, st) {                                     // 2 — rise from below
-      gsap.from(L, { yPercent: 200, opacity: 0, stagger: { each: 0.045, from: "start" }, ease: "power3.out", scrollTrigger: st });
-    },
-    function (L, st) {                                     // 3 — chaotic glitch settle
-      gsap.from(L, {
-        x: function () { return (Math.random() - 0.5) * 140; },
-        y: function () { return (Math.random() - 0.5) * 70; },
-        opacity: 0, stagger: { each: 0.025, from: "random" }, ease: "power2.out", scrollTrigger: st
-      });
-    },
-    function (L, st) {                                     // 4 — sweep from left
-      gsap.from(L, { xPercent: -240, opacity: 0, stagger: { each: 0.03, from: "start" }, ease: "power2.out", scrollTrigger: st });
-    },
-    function (L, st) {                                     // 5 — zoom out from centre
-      gsap.from(L, { scale: 0, opacity: 0, transformOrigin: "50% 50%", stagger: { each: 0.045, from: "center" }, ease: "back.out(1.6)", scrollTrigger: st });
-    }
-  ];
-
-  gsap.utils.toArray(".proj").forEach(function (card, i) {
-    var title = card.querySelector("h3");
-    if (title) {
-      var text = title.textContent;
-      title.innerHTML = "";
-      for (var j = 0; j < text.length; j++) {
-        var ch = text[j];
-        var s = document.createElement("span");
-        s.className = "tl";
-        s.textContent = ch === " " ? "\u00A0" : ch;
-        title.appendChild(s);
-      }
-      var letters = title.querySelectorAll(".tl");
-      var st = { trigger: card, start: "top 92%", end: "top 45%", scrub: 0.6, invalidateOnRefresh: true };
-      projVariants[i % projVariants.length](letters, st);
-    }
-    var desc = card.querySelector("p");
-    if (desc) gsap.from(desc, { opacity: 0, y: 24, ease: "power1.out",
-      scrollTrigger: { trigger: card, start: "top 88%", end: "top 55%", scrub: 0.6 } });
-    var tags = card.querySelector(".ptags");
-    if (tags) gsap.from(tags, { opacity: 0, x: 40, ease: "power1.out",
-      scrollTrigger: { trigger: card, start: "top 84%", end: "top 50%", scrub: 0.6 } });
-    var num = card.querySelector(".pn");
-    if (num) gsap.from(num, { scale: 0.4, opacity: 0, ease: "back.out(1.5)",
-      scrollTrigger: { trigger: card, start: "top 92%", end: "top 60%", scrub: 0.5 } });
-  });
+  /* ---- PROJECT CARDS:
 ```
 
-**Replace with:**
+Replace the whole `gsap.utils.toArray(".proj").forEach(...)` block (everything from `gsap.utils.toArray(".proj")` through its closing `});`) with:
 
 ```javascript
   /* ---- PROJECT CARDS: per-letter scroll-scrubbed entry (single unified animation) ---- */
@@ -264,11 +184,14 @@
       }
       var letters = title.querySelectorAll(".tl");
       var st = { trigger: card, start: "top 92%", end: "top 45%", scrub: 0.6, invalidateOnRefresh: true };
-      // unified animation across all cards: letters drop in from above like dots, staggered
+      // unified animation across all cards: letters scatter in like dots, staggered random
       gsap.from(letters, {
-        yPercent: -180,
+        yPercent: function () { return -180 + (Math.random() - 0.5) * 60; },
+        xPercent: function () { return (Math.random() - 0.5) * 70; },
+        rotation: function () { return (Math.random() - 0.5) * 50; },
+        scale: 0.3,
         opacity: 0,
-        stagger: { each: 0.04, from: "start" },
+        stagger: { each: 0.035, from: "random" },
         ease: "power3.out",
         scrollTrigger: st
       });
@@ -287,16 +210,57 @@
 
 ---
 
-## Final effect map
+## 4 · `css/style.css` — fix mobile gap in THE GRIND / finale section
 
-| Section | Image       | Effect                | Direction                          |
-|---------|-------------|-----------------------|------------------------------------|
-| W1 hero | ink1        | `particles`           | rain from above                    |
-| W2      | acidneon    | `particles_implode`   | **NEW** — converge inward          |
-| W3      | iris        | `particles_burst`     | explode outward from centre        |
-| W4      | italy       | `particles_tilt_left` | **NEW** — diagonal from top-LEFT   |
-| W5      | mexico      | `particles_tilt`      | diagonal from top-RIGHT            |
-| W6      | ink2        | `particles_chunky`    | slow heavy fall from above         |
-| W7      | planet2     | `particles`           | rain from above                    |
+Find the second `@media (max-width:760px)` block (the one that has `.art.bg` and `.world` inside it):
 
-Projects: all 6 cards drop letters from above with consistent stagger.
+```css
+@media (max-width:760px){
+  .art.bg{ position:absolute !important; inset:0 !important; width:100% !important; height:100% !important;
+    aspect-ratio:auto !important; margin:0 !important; }
+  .world{ padding:0 !important; min-height:100vh !important; display:block; }
+  .world .layer{ width:auto !important; margin:0 !important; }
+}
+```
+
+Replace with:
+
+```css
+@media (max-width:760px){
+  .art.bg{ position:absolute !important; inset:0 !important; width:100% !important; height:100% !important;
+    aspect-ratio:auto !important; margin:0 !important; }
+  .world{ padding:0 !important; min-height:100vh !important; display:block; }
+  .world .layer{ width:auto !important; margin:0 !important; }
+
+  /* --- W7 finale: remove forced 100vh, let content define height --- */
+  .w7{
+    min-height:auto !important;
+    padding: 10vh 7vw 12vh !important;
+    display:flex !important; flex-direction:column !important;
+    gap:2.5vh !important;
+  }
+  /* pull absolute layers into normal document flow */
+  .w7 .layer{
+    position:relative !important;
+    top:auto !important; left:auto !important;
+    right:auto !important; bottom:auto !important;
+  }
+  .w7 .contact{
+    position:relative !important;
+    bottom:auto !important; left:auto !important;
+    flex-wrap:wrap !important; gap:14px 22px !important;
+    margin-top:1vh !important;
+  }
+  footer.foot{
+    position:relative !important;
+    bottom:auto !important;
+    text-align:left !important;
+    margin-top:2vh !important;
+    padding:0 !important;
+  }
+}
+```
+
+---
+
+That's all 4. After applying, hard-refresh the browser (Ctrl+Shift+R / Cmd+Shift+R).

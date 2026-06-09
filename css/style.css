@@ -157,6 +157,33 @@ footer.foot{ position:absolute; bottom:30px; left:0; width:100%; text-align:cent
     aspect-ratio:auto !important; margin:0 !important; }
   .world{ padding:0 !important; min-height:100vh !important; display:block; }
   .world .layer{ width:auto !important; margin:0 !important; }
+
+  /* --- W7 finale: remove forced 100vh, let content define height --- */
+  .w7{
+    min-height:auto !important;
+    padding: 10vh 7vw 12vh !important;
+    display:flex !important; flex-direction:column !important;
+    gap:2.5vh !important;
+  }
+  /* pull absolute layers into normal document flow */
+  .w7 .layer{
+    position:relative !important;
+    top:auto !important; left:auto !important;
+    right:auto !important; bottom:auto !important;
+  }
+  .w7 .contact{
+    position:relative !important;
+    bottom:auto !important; left:auto !important;
+    flex-wrap:wrap !important; gap:14px 22px !important;
+    margin-top:1vh !important;
+  }
+  footer.foot{
+    position:relative !important;
+    bottom:auto !important;
+    text-align:left !important;
+    margin-top:2vh !important;
+    padding:0 !important;
+  }
 }
 
 /* ============ HERO type (white glow) ============ */

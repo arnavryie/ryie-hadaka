@@ -363,7 +363,7 @@
       }
     },
 
-    /* particles_implode — reverse of burst: dots fly INWARD from outside the canvas to targets */
+    /* particles_implode — reverse of burst: dots fly INWARD from an off-screen ring to their targets */
     particles_implode: {
       idle: true,
       setup: function (S) {

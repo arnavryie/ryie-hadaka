@@ -86,11 +86,14 @@
       }
       var letters = title.querySelectorAll(".tl");
       var st = { trigger: card, start: "top 92%", end: "top 45%", scrub: 0.6, invalidateOnRefresh: true };
-      // unified animation across all cards: letters drop in from above like dots, staggered
+      // unified animation across all cards: letters scatter in like dots, staggered random
       gsap.from(letters, {
-        yPercent: -180,
+        yPercent: function () { return -180 + (Math.random() - 0.5) * 60; },
+        xPercent: function () { return (Math.random() - 0.5) * 70; },
+        rotation: function () { return (Math.random() - 0.5) * 50; },
+        scale: 0.3,
         opacity: 0,
-        stagger: { each: 0.04, from: "start" },
+        stagger: { each: 0.035, from: "random" },
         ease: "power3.out",
         scrollTrigger: st
       });
