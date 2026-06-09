@@ -19,6 +19,12 @@ img,canvas{ display:block; max-width:100%; }
 a{ color:inherit; text-decoration:none; }
 ::selection{ background:var(--magenta); color:#0a0008; }
 
+/* hide native scrollbar (Lenis handles scroll) */
+html{ scrollbar-width:none; -ms-overflow-style:none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar{ width:0; height:0; display:none; }
+.streak-grid::-webkit-scrollbar{ width:0; height:0; display:none; }
+.streak-grid{ scrollbar-width:none; -ms-overflow-style:none; }
+
 /* loader */
 #loader{ position:fixed; inset:0; z-index:300; background:var(--black);
   display:grid; place-items:center; transition:opacity .7s ease, visibility .7s; }
