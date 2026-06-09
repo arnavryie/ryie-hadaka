@@ -1,79 +1,112 @@
-# RYIE — patch: dark transitions between section backgrounds
+# RYIE — patch: bright neon headlines + color variety
 
-One file, one block insert in `js/main.js`.
+Two files. CSS block-swap + two HTML one-liners.
 
 ---
 
 ## What this does
 
-Right now: when you scroll from one section to the next, both backgrounds
-are visible simultaneously for a while — the previous one feels "stuck"
-behind the new one until it finally fades.
+All headlines now have **RYIE-level brightness**:
 
-After this patch: each section's background canvas has its opacity tied to
-how centered the section is in the viewport. As you scroll away from a
-section, its bg fades to **0** (full dark) *before* the next section's bg
-starts fading in. Net effect: a clean **dark zone between sections**, so
-each background gets its own moment without bleeding into the neighbor.
-
-Concrete opacity curve per section (across its scroll lifetime):
-- 0 – 25 %  → opacity 0  (dark)
-- 25 – 40 % → fade in 0 → 1
-- 40 – 60 % → opacity 1  (centered, full)
-- 60 – 75 % → fade out 1 → 0
-- 75 – 100 % → opacity 0 (dark)
-
-When section 1 hits 75 % (dark), section 2 is only at 25 % (also dark) —
-that's your dark gap.
+- The hollow `.stroke` headlines (WORLDS, FULL OF, RELENTLESS, PROJECTS) were
+  flat thin outlines with **zero glow** — that's why they looked so dull.
+  Now: thicker 3px stroke + 4-layer text-shadow bloom in matching color.
+  Proper neon-sign look.
+- Added a new `s-pur` stroke variant (purple neon) + `glow-p` solid-fill purple
+  glow, for color variety.
+- Two HTML class swaps so the new variants actually appear on the site.
 
 ---
 
-## Change — `js/main.js`
+## 1 · `css/style.css` — boost stroke variants + add purple options
 
-**Find this line** (the comment that starts the image-frames scale-in block):
+**Find this block:**
 
-```javascript
-  /* ---- scale-in for the image frames as they arrive ---- */
+```css
+.c-mag{ color:var(--magenta);} .c-cyan{ color:var(--cyan);} .c-pur{ color:var(--purple);}
+.c-lime{ color:var(--lime);} .c-rose{ color:var(--rose);} .c-white{ color:var(--white);}
+.stroke{ color:transparent; -webkit-text-stroke:2px var(--white); }
+.stroke.s-cyan{ -webkit-text-stroke-color:var(--cyan); }
+.stroke.s-mag{ -webkit-text-stroke-color:var(--magenta); }
+.grad{ background:linear-gradient(120deg,#19e6ff 0%,#ff2bd6 52%,#9d5fff 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 0 14px rgba(25,230,255,.85)) drop-shadow(0 0 32px rgba(255,43,214,.65)) drop-shadow(0 0 60px rgba(25,230,255,.3)); }
+.glow-c{ color:#19e6ff;
+  text-shadow:0 0 6px #fff, 0 0 18px #19e6ff, 0 0 42px #19e6ff, 0 0 88px rgba(25,230,255,.6), 0 0 140px rgba(25,230,255,.3); }
+.glow-m{ color:#ff2bd6;
+  text-shadow:0 0 6px #fff, 0 0 18px #ff2bd6, 0 0 42px #ff2bd6, 0 0 88px rgba(255,43,214,.6), 0 0 140px rgba(255,43,214,.3); }
 ```
 
-**Insert this entire block immediately BEFORE that comment** (don't delete
-the comment line, just put this above it):
+**Replace with:**
 
-```javascript
-  /* ---- BG SECTION FADES: each canvas only visible when its section is centered, dark between ---- */
-  gsap.utils.toArray(".art.bg").forEach(function (bg) {
-    var section = bg.closest(".world");
-    if (!section) return;
-    bg.style.willChange = "opacity";
-    ScrollTrigger.create({
-      trigger: section,
-      start: "top bottom",
-      end: "bottom top",
-      onUpdate: function (self) {
-        var p = self.progress;
-        var op;
-        // bell curve: dark → fade in → hold → fade out → dark
-        if (p < 0.25) op = 0;
-        else if (p < 0.40) op = (p - 0.25) / 0.15;
-        else if (p < 0.60) op = 1;
-        else if (p < 0.75) op = (0.75 - p) / 0.15;
-        else op = 0;
-        bg.style.opacity = op;
-      }
-    });
-  });
+```css
+.c-mag{ color:var(--magenta);} .c-cyan{ color:var(--cyan);} .c-pur{ color:var(--purple);}
+.c-lime{ color:var(--lime);} .c-rose{ color:var(--rose);} .c-white{ color:var(--white);}
 
+/* HOLLOW NEON outline (RYIE-bright neon-sign look) */
+.stroke{ color:transparent; -webkit-text-stroke:3px #ffffff;
+  text-shadow:0 0 10px rgba(255,255,255,.95), 0 0 24px rgba(255,255,255,.7), 0 0 58px rgba(185,215,255,.55), 0 0 120px rgba(25,230,255,.32); }
+.stroke.s-cyan{ -webkit-text-stroke:3px #19e6ff;
+  text-shadow:0 0 10px #19e6ff, 0 0 26px #19e6ff, 0 0 58px rgba(25,230,255,.78), 0 0 120px rgba(25,230,255,.45); }
+.stroke.s-mag{ -webkit-text-stroke:3px #ff2bd6;
+  text-shadow:0 0 10px #ff2bd6, 0 0 26px #ff2bd6, 0 0 58px rgba(255,43,214,.78), 0 0 120px rgba(255,43,214,.45); }
+.stroke.s-pur{ -webkit-text-stroke:3px #8b5cff;
+  text-shadow:0 0 10px #8b5cff, 0 0 26px #8b5cff, 0 0 58px rgba(139,92,255,.78), 0 0 120px rgba(139,92,255,.45); }
+
+/* SOLID-FILL neon glow (RYIE-bright) */
+.grad{ background:linear-gradient(120deg,#19e6ff 0%,#ff2bd6 52%,#9d5fff 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 0 14px rgba(25,230,255,.85)) drop-shadow(0 0 32px rgba(255,43,214,.65)) drop-shadow(0 0 60px rgba(25,230,255,.3)); }
+.glow-c{ color:#19e6ff;
+  text-shadow:0 0 6px #fff, 0 0 18px #19e6ff, 0 0 42px #19e6ff, 0 0 88px rgba(25,230,255,.6), 0 0 140px rgba(25,230,255,.3); }
+.glow-m{ color:#ff2bd6;
+  text-shadow:0 0 6px #fff, 0 0 18px #ff2bd6, 0 0 42px #ff2bd6, 0 0 88px rgba(255,43,214,.6), 0 0 140px rgba(255,43,214,.3); }
+.glow-p{ color:#a78bff;
+  text-shadow:0 0 6px #fff, 0 0 18px #8b5cff, 0 0 42px #8b5cff, 0 0 88px rgba(139,92,255,.6), 0 0 140px rgba(139,92,255,.3); }
 ```
-
-That's it. No other file changes.
 
 ---
 
-## Tuning knob (optional)
+## 2 · `index.html` — use the new variants for color variety
 
-If you want each bg to **linger longer** (smaller dark zone), widen the
-"opacity 1" band — e.g. change `0.40` → `0.35` and `0.60` → `0.65`.
+**Find:**
+```html
+      <h2 class="ftype t-xl stroke layer" data-speed="0.5" style="top:22%; left:7%">WORLDS</h2>
+```
+**Replace with:**
+```html
+      <h2 class="ftype t-xl stroke s-pur layer" data-speed="0.5" style="top:22%; left:7%">WORLDS</h2>
+```
 
-If you want **bigger dark zones** between sections (more dramatic), tighten
-it — e.g. change `0.40` → `0.45` and `0.60` → `0.55`. The values in the
-patch are the balanced default.
+---
+
+**Find:**
+```html
+        <h2 class="ftype t-lg stroke wtitle" data-speed="0.45">PROJECTS</h2>
+```
+**Replace with:**
+```html
+        <h2 class="ftype t-lg stroke s-cyan wtitle" data-speed="0.45">PROJECTS</h2>
+```
+
+---
+
+## Headline palette after this patch
+
+| Section | Text | Class | Vibe |
+|---|---|---|---|
+| W1 hero | RYIE | (custom) | white + cyan halo |
+| W2 acidneon | FULL OF | `stroke s-cyan` | cyan neon outline |
+| W2 acidneon | HUSTLE | `grad glow-m` | gradient w/ magenta bloom |
+| W3 iris | WORLDS | `stroke s-pur` | **purple neon (NEW)** |
+| W4 italy | SHIP IT | `grad glow-c` | gradient w/ cyan bloom |
+| W5 mexico | RELENTLESS | `stroke s-mag` | magenta neon outline |
+| W6 ink2 | INK | `glow-c` | solid cyan |
+| W6 ink2 | & IRON | `grad` | gradient |
+| Projects | PROJECTS | `stroke s-cyan` | **cyan neon (NEW)** |
+| Grind | THE GRIND | `grad glow-c` | gradient w/ cyan bloom |
+| W7 finale | WE SHIP | `glow-c` | solid cyan |
+| W7 finale | FOR ALL. | `grad` | gradient |
+
+Available extra classes you can swap onto any headline whenever you want:
+`glow-p` (solid purple bright), `stroke s-pur` (purple neon outline).

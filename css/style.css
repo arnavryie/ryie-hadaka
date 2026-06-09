@@ -65,12 +65,27 @@ main{ position:relative; z-index:1; }
 
 .c-mag{ color:var(--magenta);} .c-cyan{ color:var(--cyan);} .c-pur{ color:var(--purple);}
 .c-lime{ color:var(--lime);} .c-rose{ color:var(--rose);} .c-white{ color:var(--white);}
-.stroke{ color:transparent; -webkit-text-stroke:2px var(--white); }
-.stroke.s-cyan{ -webkit-text-stroke-color:var(--cyan); }
-.stroke.s-mag{ -webkit-text-stroke-color:var(--magenta); }
-.grad{ background:linear-gradient(120deg,var(--cyan),var(--magenta) 60%,var(--purple)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-.glow-c{ text-shadow:0 2px 20px rgba(0,0,0,.6), 0 0 34px rgba(25,230,255,.5); }
-.glow-m{ text-shadow:0 2px 20px rgba(0,0,0,.6), 0 0 34px rgba(255,43,214,.5); }
+
+/* HOLLOW NEON outline (RYIE-bright neon-sign look) */
+.stroke{ color:transparent; -webkit-text-stroke:3px #ffffff;
+  text-shadow:0 0 10px rgba(255,255,255,.95), 0 0 24px rgba(255,255,255,.7), 0 0 58px rgba(185,215,255,.55), 0 0 120px rgba(25,230,255,.32); }
+.stroke.s-cyan{ -webkit-text-stroke:3px #19e6ff;
+  text-shadow:0 0 10px #19e6ff, 0 0 26px #19e6ff, 0 0 58px rgba(25,230,255,.78), 0 0 120px rgba(25,230,255,.45); }
+.stroke.s-mag{ -webkit-text-stroke:3px #ff2bd6;
+  text-shadow:0 0 10px #ff2bd6, 0 0 26px #ff2bd6, 0 0 58px rgba(255,43,214,.78), 0 0 120px rgba(255,43,214,.45); }
+.stroke.s-pur{ -webkit-text-stroke:3px #8b5cff;
+  text-shadow:0 0 10px #8b5cff, 0 0 26px #8b5cff, 0 0 58px rgba(139,92,255,.78), 0 0 120px rgba(139,92,255,.45); }
+
+/* SOLID-FILL neon glow (RYIE-bright) */
+.grad{ background:linear-gradient(120deg,#19e6ff 0%,#ff2bd6 52%,#9d5fff 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 0 14px rgba(25,230,255,.85)) drop-shadow(0 0 32px rgba(255,43,214,.65)) drop-shadow(0 0 60px rgba(25,230,255,.3)); }
+.glow-c{ color:#19e6ff;
+  text-shadow:0 0 6px #fff, 0 0 18px #19e6ff, 0 0 42px #19e6ff, 0 0 88px rgba(25,230,255,.6), 0 0 140px rgba(25,230,255,.3); }
+.glow-m{ color:#ff2bd6;
+  text-shadow:0 0 6px #fff, 0 0 18px #ff2bd6, 0 0 42px #ff2bd6, 0 0 88px rgba(255,43,214,.6), 0 0 140px rgba(255,43,214,.3); }
+.glow-p{ color:#a78bff;
+  text-shadow:0 0 6px #fff, 0 0 18px #8b5cff, 0 0 42px #8b5cff, 0 0 88px rgba(139,92,255,.6), 0 0 140px rgba(139,92,255,.3); }
 
 /* ---------- floating image frames ---------- */
 .art{ position:absolute; overflow:hidden; background:#0a0b11;
