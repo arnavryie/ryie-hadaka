@@ -246,7 +246,7 @@ footer.foot{ position:absolute; bottom:30px; left:0; width:100%; text-align:cent
 .sstat span{ font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--dim); }
 
 @media (max-width:760px){
-  .w-work, .w-grind{ padding:8vh 0 6vh; }
+  .w-work, .w-grind{ padding:8vh 0 6vh; min-height:auto !important; }
   .proj{ flex-wrap:wrap; gap:12px; padding:18px; }
   .proj .pn{ font-size:26px; min-width:40px; }
   .streak-stats{ gap:26px; }
