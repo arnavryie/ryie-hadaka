@@ -1,51 +1,45 @@
-arnhvooo, [09-06-2026 15:11]
-# RYIE — patch: minimal glow on mobile
+# RYIE — patch: tighten mobile section spacing
 
-One file, one block swap in css/style.css. Replacing the previous mobile damping
-with a more aggressive version — single tight shadow layer, no outer halo.
+One file, one line add in `css/style.css`.
 
------
+The issue: on desktop, `padding: 18vh 0 14vh` on `.w-work` and `.w-grind`
+is proportional (looks good). On mobile (390px wide, ~800px viewport height),
+18vh = 144px and 14vh = 112px — **huge** relative padding that squishes content
+and leaves massive black voids between sections.
 
-## css/style.css
+On phone, the projects section and grind section stick too close to things above,
+and the grind bottom has a giant empty gap before WE SHIP.
 
-Find this block (the previous mobile damping):
-/* MOBILE GLOW DAMPING — shadow blur scales with screen proportionally */
+---
+
+## `css/style.css`
+
+**Find this block** (the last `@media (max-width:760px)` near the end):
+
+```css
 @media (max-width:760px){
-  .hero-name{
-    text-shadow:0 1px 8px rgba(0,0,0,.75), 0 0 8px rgba(185,215,255,.22), 0 0 20px rgba(25,230,255,.1); }
-  .stroke{ -webkit-text-stroke:1.5px #ffffff;
-    text-shadow:0 0 3px rgba(255,255,255,.5), 0 0 10px rgba(185,215,255,.22); }
-  .stroke.s-cyan{ -webkit-text-stroke:1.5px #19e6ff;
-    text-shadow:0 0 3px rgba(25,230,255,.6), 0 0 10px rgba(25,230,255,.28); }
-  .stroke.s-mag{ -webkit-text-stroke:1.5px #ff2bd6;
-    text-shadow:0 0 3px rgba(255,43,214,.6), 0 0 10px rgba(255,43,214,.28); }
-  .stroke.s-pur{ -webkit-text-stroke:1.5px #8b5cff;
-    text-shadow:0 0 3px rgba(139,92,255,.6), 0 0 10px rgba(139,92,255,.28); }
-  .grad{ filter:drop-shadow(0 0 4px rgba(25,230,255,.4)) drop-shadow(0 0 10px rgba(255,43,214,.22)); }
-  .glow-c{ text-shadow:0 0 3px rgba(255,255,255,.4), 0 0 8px #19e6ff, 0 0 18px rgba(25,230,255,.3); }
-  .glow-m{ text-shadow:0 0 3px rgba(255,255,255,.4), 0 0 8px #ff2bd6, 0 0 18px rgba(255,43,214,.3); }
-  .glow-p{ text-shadow:0 0 3px rgba(255,255,255,.4), 0 0 8px #8b5cff, 0 0 18px rgba(139,92,255,.3); }
+  .proj{ flex-wrap:wrap; gap:12px; padding:18px; }
+  .proj .pn{ font-size:26px; min-width:40px; }
+  .streak-stats{ gap:26px; }
 }
+```
 
-Replace with:
-/* MOBILE GLOW DAMPING — single tight shadow, no outer halo */
+**Replace with:**
+
+```css
 @media (max-width:760px){
-  .hero-name{
-    text-shadow:0 1px 8px rgba(0,0,0,.75), 0 0 6px rgba(185,215,255,.22); }
-  .stroke{ -webkit-text-stroke:1.5px #ffffff;
-    text-shadow:0 0 4px rgba(255,255,255,.35); }
-  .stroke.s-cyan{ -webkit-text-stroke:1.5px #19e6ff;
-    text-shadow:0 0 4px rgba(25,230,255,.4); }
-  .stroke.s-mag{ -webkit-text-stroke:1.5px #ff2bd6;
-    text-shadow:0 0 4px rgba(255,43,214,.4); }
-  .stroke.s-pur{ -webkit-text-stroke:1.5px #8b5cff;
-    text-shadow:0 0 4px rgba(139,92,255,.4); }
-  .grad{ filter:drop-shadow(0 0 4px rgba(25,230,255,.3)); }
-  .glow-c{ text-shadow:0 0 6px rgba(25,230,255,.4); }
-  .glow-m{ text-shadow:0 0 6px rgba(255,43,214,.4); }
-  .glow-p{ text-shadow:0 0 6px rgba(139,92,255,.4); }
+  .w-work, .w-grind{ padding:8vh 0 6vh; }
+  .proj{ flex-wrap:wrap; gap:12px; padding:18px; }
+  .proj .pn{ font-size:26px; min-width:40px; }
+  .streak-stats{ gap:26px; }
 }
+```
 
------
+---
 
-What changed: each headline class went from 2–3 shadow layers down to 1 single tight shadow at 4–6px blur. The wide halo layer (10–18px) is gone entirely on mobile. Color is still visible as a faint edge glow but no fog/halo. Should now match the crispness of the small RYIE brandtag.
+What changed: `.w-work, .w-grind` padding on mobile is now `8vh top / 6vh bottom`
+instead of `18vh / 14vh`. That's about 55-60% smaller, which scales the section
+spacing properly to phone viewport. Content flows tight but readable, no weird
+gaps.
+
+Desktop is untouched — keeps the original airy `18vh / 14vh` padding.
