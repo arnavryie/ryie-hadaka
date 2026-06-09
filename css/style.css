@@ -254,3 +254,20 @@ footer.foot{ position:absolute; bottom:30px; left:0; width:100%; text-align:cent
 /* per-letter spans for project title scroll animations */
 .proj h3 .tl { display: inline-block; will-change: transform, opacity; }
 
+/* MOBILE GLOW DAMPING — single tight shadow, no outer halo */
+@media (max-width:760px){
+  .hero-name{
+    text-shadow:0 1px 8px rgba(0,0,0,.75), 0 0 6px rgba(185,215,255,.22); }
+  .stroke{ -webkit-text-stroke:1.5px #ffffff;
+    text-shadow:0 0 4px rgba(255,255,255,.35); }
+  .stroke.s-cyan{ -webkit-text-stroke:1.5px #19e6ff;
+    text-shadow:0 0 4px rgba(25,230,255,.4); }
+  .stroke.s-mag{ -webkit-text-stroke:1.5px #ff2bd6;
+    text-shadow:0 0 4px rgba(255,43,214,.4); }
+  .stroke.s-pur{ -webkit-text-stroke:1.5px #8b5cff;
+    text-shadow:0 0 4px rgba(139,92,255,.4); }
+  .grad{ filter:drop-shadow(0 0 4px rgba(25,230,255,.3)); }
+  .glow-c{ text-shadow:0 0 6px rgba(25,230,255,.4); }
+  .glow-m{ text-shadow:0 0 6px rgba(255,43,214,.4); }
+  .glow-p{ text-shadow:0 0 6px rgba(139,92,255,.4); }
+}
